@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 @Service
 public class FilesStorageServiceImpl implements FilesStorageService {
-    private final Path root = Paths.get("src/main/resources/uploads");
+    private final Path root = Paths.get("src/main/resources/preprocess");
 
     @Override
     public void init() {
@@ -53,6 +53,16 @@ public class FilesStorageServiceImpl implements FilesStorageService {
                 throw new RuntimeException("Could not read the file!");
             }
         } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean delete(String filename) {
+        try {
+            Path file = root.resolve(filename);
+            return Files.deleteIfExists(file);
+        } catch (IOException e) {
             throw new RuntimeException("Error: " + e.getMessage());
         }
     }

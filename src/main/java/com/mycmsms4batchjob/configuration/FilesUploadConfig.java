@@ -13,7 +13,8 @@ public class FilesUploadConfig {
 
     @Bean
     public void run() throws Exception {
-//    storageService.deleteAll();
+        // comment to make the file persist
+        storageService.deleteAll();
         storageService.init();
     }
 
