@@ -1,6 +1,6 @@
 package com.mycmsms4batchjob.configuration;
 
-import com.mycmsms4batchjob.domain.Customer;
+import com.mycmsms4batchjob.entity.Customer;
 import com.mycmsms4batchjob.processor.CustomerItemProcessor;
 import com.mycmsms4batchjob.repository.CustomerRepository;
 import lombok.AllArgsConstructor;
