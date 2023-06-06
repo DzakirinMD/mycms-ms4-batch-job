@@ -10,4 +10,13 @@ Once the application is running on port 50003, access the API docs from web usin
 
 batch version
 java version
-spring version
+spring boot version 2.7.12
+
+
+<h1>Dependency Version</h1>
+
+| Project Dependency  | Version |
+|---------------------|---------|
+| `Spring Boot`       | 2.7.12  |
+| `Java`              | 11      |
+| `spring-batch-core` | 4.3.8   |
