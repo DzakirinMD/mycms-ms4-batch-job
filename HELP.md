@@ -1,5 +1,5 @@
 # Read Me First
-The following was discovered as part of building this project: a
+The following was discovered as part of building this project: b
 
 * The original package name 'com.mycms-ms4-batch-job' is invalid and this project uses 'com.mycmsms4batchjob' instead.
 
