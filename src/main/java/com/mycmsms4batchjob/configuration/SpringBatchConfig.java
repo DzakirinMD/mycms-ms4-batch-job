@@ -27,24 +27,21 @@ import org.springframework.core.task.TaskExecutor;
 public class SpringBatchConfig {
 
     // not using @Autowired because only have 1 constructor.
-//    @Autowired
+    // @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
-//    @Autowired
+    // @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-//    @Autowired
+    // @Autowired
     private CustomerRepository customerRepository;
 
     // start::reader[]
     @Bean
     public FlatFileItemReader<Customer> reader() {
         FlatFileItemReader<Customer> flatFileItemReader = new FlatFileItemReader<>();
-        // csv consist of 1000 rows. completed in 4 second
-//        flatFileItemReader.setResource(new FileSystemResource("/Users/dzakirinmuhammad/IdeaProjects/my-cms/microservices/batch-job/src/main/resources/customers.csv"));
         flatFileItemReader.setResource(new FileSystemResource("src/main/resources/customers.csv"));
         flatFileItemReader.setName("csvReaders");
-        // This will skip the first row (the csv header)
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());
 
@@ -52,22 +49,13 @@ public class SpringBatchConfig {
     }
 
     private LineMapper<Customer> lineMapper() {
-
         DefaultLineMapper<Customer> lineMapper = new DefaultLineMapper<>();
-
-        // Line tokenizer will extract the value from csv file
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-        // using comma as delimiter
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        // set the file header
-        lineTokenizer.setNames("id", "firstName", "lastName", "email", "gender", "contactNo", "country" , "dob");
-
-        // fieldSetMapper will map csv value to Customer object
+        lineTokenizer.setNames("id", "firstName", "lastName", "email", "gender", "contactNo", "country", "dob");
         BeanWrapperFieldSetMapper<Customer> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
         fieldSetMapper.setTargetType(Customer.class);
-
-        // sending both lineTokenizer and FieldSetMapper to LineMapper
         lineMapper.setLineTokenizer(lineTokenizer);
         lineMapper.setFieldSetMapper(fieldSetMapper);
 
@@ -75,20 +63,16 @@ public class SpringBatchConfig {
     }
     // end::reader[]
 
-
     // start::processor[]
     @Bean
     public CustomerItemProcessor processor() {
         return new CustomerItemProcessor();
     }
-
     // end::processor[]
 
     // start::writer[]
     @Bean
     public RepositoryItemWriter<Customer> writer() {
-
-        // Telling the writer to use customerRepository.save() method to write the csv data to the DB
         RepositoryItemWriter<Customer> writer = new RepositoryItemWriter<>();
         writer.setRepository(customerRepository);
         writer.setMethodName("save");
@@ -108,7 +92,6 @@ public class SpringBatchConfig {
                 .writer(writer())
 //                .taskExecutor(taskExecutor())
                 .build();
-
     }
     // end::step[]
 
@@ -118,28 +101,27 @@ public class SpringBatchConfig {
      */
     @Bean
     public Job runCSVJob() {
-
         return jobBuilderFactory.get("importCustomer")
                 .flow(step1())
-//                .next(anotherStep)
                 .end()
+                .listener(jobCompletionListener()) // Add a job completion listener
                 .build();
     }
     // end::job[]
 
+    // start::listener[]
+    @Bean
+    public JobCompletionListener jobCompletionListener() {
+        return new JobCompletionListener();
+    }
+    // end::listener[]
+
     // start::taskexecutor[]
-    /**
-     * THIS IS NOT REQUIRE TO BE USED !!!!
-     * Asynchronous job to create 10 thread will execute parallel/concurrently in processing the batch
-     * @return asyncTaskExecutor that will run the thread in random order
-     */
     @Bean
     public TaskExecutor taskExecutor() {
-
         SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor();
         asyncTaskExecutor.setConcurrencyLimit(10);
-
-        return  asyncTaskExecutor;
+        return asyncTaskExecutor;
     }
     // end::taskexecutor[]
 }
