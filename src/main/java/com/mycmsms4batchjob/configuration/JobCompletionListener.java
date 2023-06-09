@@ -12,7 +12,10 @@ import java.nio.file.StandardCopyOption;
 
 public class JobCompletionListener extends JobExecutionListenerSupport {
 
-    @Value("${output.folder}") // Specify the output folder location in application.properties
+    @Value("${input.folder}")
+    private String inputFolder;
+
+    @Value("${output.folder}")
     private String outputFolder;
 
     @Override
@@ -20,7 +23,7 @@ public class JobCompletionListener extends JobExecutionListenerSupport {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
             try {
                 // Move the file to the output folder
-                String sourceFilePath = "src/main/resources/preprocess/customers.csv";
+                String sourceFilePath = inputFolder + "/customers.csv";
                 String targetFilePath = outputFolder + "/customers.csv";
                 Path source = new File(sourceFilePath).toPath();
                 Path target = new File(targetFilePath).toPath();

@@ -8,6 +8,7 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -17,12 +18,14 @@ import java.util.stream.Stream;
 
 @Service
 public class FilesStorageServiceImpl implements FilesStorageService {
-    private final Path root = Paths.get("src/main/resources/preprocess");
+    private final Path root = Paths.get("src/main/resources/batchfiles");
 
     @Override
     public void init() {
         try {
             Files.createDirectories(root);
+            Files.createDirectory(root.resolve("preprocess"));
+            Files.createDirectory(root.resolve("postprocess"));
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize folder for upload!");
         }
@@ -30,13 +33,13 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 
     @Override
     public void save(MultipartFile file) {
-        try {
-            Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
+        try (InputStream inputStream = file.getInputStream()) {
+            Path destination = root.resolve("preprocess").resolve(file.getOriginalFilename());
+            Files.copy(inputStream, destination);
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
                 throw new RuntimeException("A file of that name already exists.");
             }
-
             throw new RuntimeException(e.getMessage());
         }
     }
